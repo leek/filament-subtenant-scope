@@ -4,6 +4,8 @@ Second-level tenancy for [Filament](https://filamentphp.com/) panels. Adds a top
 
 Filament's built-in tenancy gives you one tenant. This plugin adds *another* level on top: pick a sub-scope, and resources, widgets, navigation badges, and global search all auto-filter.
 
+<img width="2052" height="726" alt="screenshot" src="https://github.com/user-attachments/assets/f38cdd23-2c9d-4749-b4f8-b53ebc01534a" />
+
 ## Why
 
 You already have multi-tenancy (e.g. `Company`). Inside each company you also need a soft filter — "show me only the North service area" — that:
