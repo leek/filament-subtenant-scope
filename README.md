@@ -27,6 +27,26 @@ This plugin does that with one trait + one `->scopes([...])` array.
 composer require leek/filament-subtenant-scope
 ```
 
+### Styles
+
+Tell your panel theme to compile the plugin's blade utility classes by adding a `@source` directive to the panel theme configured with `->viteTheme(...)`:
+
+```css
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../vendor/leek/filament-subtenant-scope/resources/views/**/*.blade.php';
+```
+
+Then rebuild your app assets:
+
+```bash
+npm run build
+```
+
+Without this, responsive utilities like `hidden sm:inline` used inside the dropdown won't be compiled into your panel CSS and the dropdown label may collapse on wide screens.
+
+### Register the plugin
+
 Register the plugin on your panel and define one or more scopes:
 
 ```php

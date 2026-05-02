@@ -31,7 +31,7 @@
                             @if ($selectedOption)
                                 {{ $selectedOption->{$labelAttr} }}
                             @else
-                                All<span class="hidden sm:inline"> {{ $scope->label }}s</span>
+                                All<span class="hidden sm:inline"> {{ \Illuminate\Support\Str::plural($scope->label) }}</span>
                             @endif
                         </span>
                         <x-filament::icon icon="heroicon-m-chevron-down" class="h-3.5 w-3.5 text-white/50" />
@@ -45,7 +45,7 @@
                         :icon="$selectedId === null ? 'heroicon-o-check-circle' : null"
                         :class="$selectedId === null ? 'bg-primary-50 dark:bg-primary-950' : ''"
                     >
-                        All {{ $scope->label }}s
+                        All {{ \Illuminate\Support\Str::plural($scope->label) }}
                     </x-filament::dropdown.list.item>
 
                     <hr class="border-gray-200 dark:border-white/10 my-1" />
