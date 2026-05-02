@@ -10,9 +10,9 @@
 
         @if ($options->count() === 1)
             {{-- Single option: static indicator --}}
-            <div class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-white/90">
+            <div class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-700 dark:text-white/90">
                 @if ($scope->getIcon())
-                    <x-filament::icon :icon="$scope->getIcon()" class="h-4 w-4 text-white/70" />
+                    <x-filament::icon :icon="$scope->getIcon()" class="h-4 w-4 text-gray-500 dark:text-white/70" />
                 @endif
                 <span>{{ $options->first()->{$labelAttr} }}</span>
             </div>
@@ -22,19 +22,19 @@
                 <x-slot name="trigger">
                     <button
                         type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-white/10"
+                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-white/90 dark:hover:bg-white/10"
                     >
                         @if ($scope->getIcon())
-                            <x-filament::icon :icon="$scope->getIcon()" class="h-4 w-4 text-white/70" />
+                            <x-filament::icon :icon="$scope->getIcon()" class="h-4 w-4 text-gray-500 dark:text-white/70" />
                         @endif
-                        <span class="text-white/90">
+                        <span>
                             @if ($selectedOption)
                                 {{ $selectedOption->{$labelAttr} }}
                             @else
                                 All<span class="hidden sm:inline"> {{ \Illuminate\Support\Str::plural($scope->label) }}</span>
                             @endif
                         </span>
-                        <x-filament::icon icon="heroicon-m-chevron-down" class="h-3.5 w-3.5 text-white/50" />
+                        <x-filament::icon icon="heroicon-m-chevron-down" class="h-3.5 w-3.5 text-gray-400 dark:text-white/50" />
                     </button>
                 </x-slot>
 
@@ -48,7 +48,7 @@
                         All {{ \Illuminate\Support\Str::plural($scope->label) }}
                     </x-filament::dropdown.list.item>
 
-                    <hr class="border-gray-200 dark:border-white/10 my-1" />
+                    <hr class="my-1 border-gray-200 dark:border-white/10" />
 
                     @foreach ($options as $option)
                         @php
