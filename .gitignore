@@ -1,0 +1,7 @@
+/vendor
+/.phpunit.cache
+/node_modules
+composer.lock
+.DS_Store
+.phpunit.result.cache
+/.claude

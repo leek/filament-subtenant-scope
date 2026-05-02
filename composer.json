@@ -1,0 +1,68 @@
+{
+    "name": "leek/filament-subtenant-scope",
+    "description": "Second-level tenancy scope (e.g. service area, region, location) for Filament panels — topnav dropdown filter that scopes Eloquent queries globally.",
+    "keywords": [
+        "leek",
+        "laravel",
+        "filament",
+        "filamentphp",
+        "tenancy",
+        "multi-tenancy",
+        "scope",
+        "sub-tenant"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris Jones",
+            "email": "leeked@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/leek/filament-subtenant-scope/issues",
+        "source": "https://github.com/leek/filament-subtenant-scope"
+    },
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^4.0 || ^5.0",
+        "livewire/livewire": "^3.0 || ^4.0",
+        "spatie/laravel-package-tools": "^1.15"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "pestphp/pest": "^3.0 || ^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0 || ^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Leek\\FilamentSubtenantScope\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Leek\\FilamentSubtenantScope\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Leek\\FilamentSubtenantScope\\FilamentSubtenantScopeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
