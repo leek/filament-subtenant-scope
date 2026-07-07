@@ -35,6 +35,10 @@
         "pestphp/pest": "^3.0 || ^4.0",
         "pestphp/pest-plugin-laravel": "^3.0 || ^4.0"
     },
+    "suggest": {
+        "leek/filament-ui-plus": "Enhanced Filament UI to polish the panel chrome around your tenant switcher.",
+        "leek/filament-workflows": "Automate actions across your tenants with visual workflows."
+    },
     "autoload": {
         "psr-4": {
             "Leek\\FilamentSubtenantScope\\": "src/"
