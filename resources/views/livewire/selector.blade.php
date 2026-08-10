@@ -1,4 +1,10 @@
-<div class="fi-subtenant-scope-selector flex items-center gap-2 [&_.fi-dropdown-panel]:z-[70]">
+{{--
+    Teleport is required: Filament's .fi-topbar-ctn uses overflow-x-clip, which
+    (via the CSS overflow pairing rules) also clips the y-axis. Without teleport
+    the panel opens but is clipped to the topbar height and appears "stuck".
+    Same pattern as topbar nav groups + user menu.
+--}}
+<div class="fi-subtenant-scope-selector flex items-center gap-2">
     @foreach ($this->scopes as $scope)
         @php
             $options = $this->getOptionsForScope($scope);
@@ -18,7 +24,7 @@
             </div>
         @elseif ($hasMultiple)
             {{-- Multiple options: dropdown --}}
-            <x-filament::dropdown placement="bottom-start">
+            <x-filament::dropdown placement="bottom-start" teleport>
                 <x-slot name="trigger">
                     <button
                         type="button"
