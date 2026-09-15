@@ -44,7 +44,10 @@ trait HasSubtenantScopes
             }
 
             if ($column !== null) {
-                $builder->where($column, $selectedId);
+                // Qualify with the model's table: an unqualified column is
+                // ambiguous the moment the query joins another table that
+                // carries the same foreign key (e.g. appointments ⋈ locations).
+                $builder->where($builder->qualifyColumn($column), $selectedId);
 
                 continue;
             }
