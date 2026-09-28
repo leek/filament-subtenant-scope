@@ -12,6 +12,7 @@
             $selectedOption = $selectedId ? $options->firstWhere('id', $selectedId) : null;
             $labelAttr = $scope->getLabelAttribute();
             $hasMultiple = $options->count() > 1;
+            $manageUrl = $hasMultiple ? $scope->resolveManageUrl(auth()->user()) : null;
         @endphp
 
         @if ($options->count() === 1)
@@ -68,6 +69,19 @@
                             {{ $option->{$labelAttr} }}
                         </x-filament::dropdown.list.item>
                     @endforeach
+
+                    @if ($manageUrl)
+                        <hr class="my-1 border-gray-200 dark:border-white/10" />
+
+                        <x-filament::dropdown.list.item
+                            tag="a"
+                            :href="$manageUrl"
+                            icon="heroicon-m-cog-6-tooth"
+                            class="fi-subtenant-scope-manage-link"
+                        >
+                            {{ $scope->getManageLabel() }}
+                        </x-filament::dropdown.list.item>
+                    @endif
                 </x-filament::dropdown.list>
             </x-filament::dropdown>
         @endif

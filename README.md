@@ -78,6 +78,17 @@ public function panel(Panel $panel): Panel
 
 That's the whole topnav setup. The dropdown renders next to the global search.
 
+### Manage link
+
+Add a link at the bottom of the dropdown pointing to wherever the options are managed. The closure receives the authenticated user; return `null` to hide the link (e.g. when the user lacks permission). The label defaults to "Manage {plural label}".
+
+```php
+SubtenantScope::make('service_area', 'Service Area', ServiceArea::class, 'service_area_id')
+    ->manageUrl(fn ($user) => $user?->can('viewAny', ServiceArea::class)
+        ? ServiceAreaResource::getUrl('index')
+        : null),
+```
+
 ## Opt resources into the scope
 
 Add the `HasSubtenantScopes` trait and map each scope key to the FK column on the resource's model:

@@ -17,6 +17,10 @@ final class SubtenantScope
 
     private ?Closure $optionsQuery = null;
 
+    private Closure|string|null $manageUrl = null;
+
+    private ?string $manageLabel = null;
+
     /**
      * @param  class-string<Model>  $modelClass
      */
@@ -60,6 +64,33 @@ final class SubtenantScope
         $this->optionsQuery = $callback;
 
         return $this;
+    }
+
+    /**
+     * Link rendered at the bottom of the dropdown so users can jump to where the
+     * options are managed. A closure receives the authenticated user (or null)
+     * and may return null to hide the link, e.g. when the user lacks permission.
+     *
+     * @param  Closure(mixed): ?string|string|null  $url
+     */
+    public function manageUrl(Closure|string|null $url, ?string $label = null): static
+    {
+        $this->manageUrl = $url;
+        $this->manageLabel = $label;
+
+        return $this;
+    }
+
+    public function resolveManageUrl(mixed $user): ?string
+    {
+        $url = $this->manageUrl instanceof Closure ? ($this->manageUrl)($user) : $this->manageUrl;
+
+        return filled($url) ? $url : null;
+    }
+
+    public function getManageLabel(): string
+    {
+        return $this->manageLabel ?? 'Manage '.str($this->label)->plural();
     }
 
     public function getIcon(): string|BackedEnum|null
