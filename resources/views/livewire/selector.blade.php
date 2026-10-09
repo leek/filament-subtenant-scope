@@ -11,11 +11,13 @@
             $selectedId = $this->selectedValues[$scope->key] ?? null;
             $selectedOption = $selectedId ? $options->firstWhere('id', $selectedId) : null;
             $labelAttr = $scope->getLabelAttribute();
-            $hasMultiple = $options->count() > 1;
+            // A nested scope keeps its dropdown with a single option: picking the
+            // one clinic in an area is still narrower than the area alone.
+            $hasMultiple = $options->count() > 1 || ($scope->hasParent() && $options->isNotEmpty());
             $manageUrl = $hasMultiple ? $scope->resolveManageUrl(auth()->user()) : null;
         @endphp
 
-        @if ($options->count() === 1)
+        @if ($options->count() === 1 && ! $hasMultiple)
             {{-- Single option: static indicator --}}
             <div class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-700 dark:text-white/90">
                 @if ($scope->getIcon())
@@ -52,7 +54,7 @@
                         :icon="$selectedId === null ? 'heroicon-o-check-circle' : null"
                         :class="$selectedId === null ? 'bg-primary-50 dark:bg-primary-950' : ''"
                     >
-                        All {{ \Illuminate\Support\Str::plural($scope->label) }}
+                        {{ $this->getAllOptionLabel($scope) }}
                     </x-filament::dropdown.list.item>
 
                     <hr class="my-1 border-gray-200 dark:border-white/10" />

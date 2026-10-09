@@ -215,6 +215,26 @@ protected static array $subTenantScopes = [
 ];
 ```
 
+### Nested scopes
+
+When one scope lives inside another (locations inside a region), declare the
+parent with `dependsOn()`, naming the parent scope's key and the child model's
+column that points at it:
+
+```php
+SubtenantScope::make('location', 'Location', Location::class, 'location_id')
+    ->dependsOn('region', 'region_id'),
+```
+
+- While a region is selected, the location dropdown offers only that region's
+  locations, and its "All" option reads "All Locations in North".
+- Picking a different region keeps the selected location only if it is inside
+  the new region; going back to "All Regions" clears it.
+- A stored location that falls outside the selected region (stale session, URL
+  or user setting) is ignored, so a mismatched pair can never filter to nothing.
+- A nested scope keeps its dropdown even with a single option, since picking the
+  region's only location is still narrower than the region alone.
+
 ## Listening for changes
 
 The Livewire component dispatches `sub-scope-changed` after every selection (it also triggers a full page reload to refresh server-rendered scoped data):

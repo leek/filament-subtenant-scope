@@ -21,6 +21,10 @@ final class SubtenantScope
 
     private ?string $manageLabel = null;
 
+    private ?string $parentKey = null;
+
+    private ?string $parentColumn = null;
+
     /**
      * @param  class-string<Model>  $modelClass
      */
@@ -79,6 +83,35 @@ final class SubtenantScope
         $this->manageLabel = $label;
 
         return $this;
+    }
+
+    /**
+     * Nest this scope under another one, e.g. locations under a service area.
+     * While the parent has a selection, this scope only offers options whose
+     * `$parentColumn` matches it, and changing the parent drops a selection
+     * that is no longer inside it.
+     */
+    public function dependsOn(string $parentKey, string $parentColumn): static
+    {
+        $this->parentKey = $parentKey;
+        $this->parentColumn = $parentColumn;
+
+        return $this;
+    }
+
+    public function getParentKey(): ?string
+    {
+        return $this->parentKey;
+    }
+
+    public function getParentColumn(): ?string
+    {
+        return $this->parentColumn;
+    }
+
+    public function hasParent(): bool
+    {
+        return $this->parentKey !== null;
     }
 
     public function resolveManageUrl(mixed $user): ?string

@@ -65,6 +65,19 @@ class SubtenantScopeManager
     }
 
     /**
+     * Scopes nested directly under the given one via {@see SubtenantScope::dependsOn()}.
+     *
+     * @return array<SubtenantScope>
+     */
+    public function getChildScopes(string $parentKey): array
+    {
+        return array_values(array_filter(
+            $this->scopes,
+            fn (SubtenantScope $scope): bool => $scope->getParentKey() === $parentKey,
+        ));
+    }
+
+    /**
      * Resolve selected ID with priority: URL param > session > user persistence.
      * Returns null to mean "All" (no filtering).
      */
@@ -83,6 +96,22 @@ class SubtenantScopeManager
     }
 
     protected function resolveSelectedId(string $scopeKey): ?int
+    {
+        $selectedId = $this->resolveStoredSelectedId($scopeKey);
+        $scope = $this->getScope($scopeKey);
+        $user = $this->getUser();
+
+        // A nested selection only counts while it sits inside the parent's
+        // current selection: a stale pair would otherwise match nothing.
+        if ($selectedId !== null && $scope?->hasParent() && $user
+            && ! $this->optionsContain($scope, $user, $selectedId)) {
+            return null;
+        }
+
+        return $selectedId;
+    }
+
+    protected function resolveStoredSelectedId(string $scopeKey): ?int
     {
         // 1. URL param — persisted so bookmarked/shared scoped URLs stay sticky.
         $queryParameter = "scope_{$scopeKey}";
@@ -106,8 +135,10 @@ class SubtenantScopeManager
         $user = $this->getUser();
         if ($user) {
             // If user has exactly 1 option there is nothing to filter between, so don't.
+            // A nested scope is exempt: its one option is still a narrower filter
+            // than its parent alone (a service area's only clinic).
             $scope = $this->getScope($scopeKey);
-            if ($scope) {
+            if ($scope && ! $scope->hasParent()) {
                 $options = $this->getOptionsForScope($scope, $user);
                 if ($options->count() === 1) {
                     return null;
@@ -146,6 +177,32 @@ class SubtenantScopeManager
         if ($user && $this->persistSetter) {
             ($this->persistSetter)($user, $scopeKey, $id);
         }
+
+        $this->releaseChildSelections($scopeKey, $id, $user);
+    }
+
+    /**
+     * A child selection survives a parent change only when it is still inside
+     * the newly selected parent. Clearing the parent ("All") clears the child
+     * too: keeping one clinic selected under "All areas" would leave the user
+     * looking at a single clinic while the topbar reads "All".
+     */
+    protected function releaseChildSelections(string $parentKey, ?int $parentId, ?Authenticatable $user): void
+    {
+        foreach ($this->getChildScopes($parentKey) as $child) {
+            $this->forgetOptions($child->key);
+            unset($this->selectedIdCache[$child->key]);
+
+            $childId = $this->resolveStoredSelectedId($child->key);
+
+            if ($childId === null) {
+                continue;
+            }
+
+            if ($parentId === null || ! $user || ! $this->optionsContain($child, $user, $childId)) {
+                $this->setSelectedId($child->key, null);
+            }
+        }
     }
 
     /**
@@ -159,10 +216,35 @@ class SubtenantScopeManager
             return $this->optionsCache[$scope->key];
         }
 
-        $result = $scope->resolveOptionsQuery($user)->get();
+        $query = $scope->resolveOptionsQuery($user);
+
+        if ($scope->hasParent()) {
+            $parentId = $this->getSelectedId((string) $scope->getParentKey());
+
+            if ($parentId !== null) {
+                $query->where($query->qualifyColumn((string) $scope->getParentColumn()), $parentId);
+            }
+        }
+
+        $result = $query->get();
         $this->optionsCache[$scope->key] = $result;
 
         return $result;
+    }
+
+    protected function optionsContain(SubtenantScope $scope, Authenticatable $user, int $id): bool
+    {
+        return $this->getOptionsForScope($scope, $user)
+            ->contains(fn (Model $option): bool => (int) $option->getKey() === $id);
+    }
+
+    protected function forgetOptions(string $scopeKey): void
+    {
+        unset($this->optionsCache[$scopeKey]);
+
+        foreach ($this->getChildScopes($scopeKey) as $child) {
+            $this->forgetOptions($child->key);
+        }
     }
 
     protected function getUser(): ?Authenticatable

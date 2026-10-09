@@ -33,7 +33,11 @@ class SubtenantScopeSelector extends Component
 
         $manager = resolve(SubtenantScopeManager::class);
         $manager->setSelectedId($scopeKey, $selectedId);
-        $this->selectedValues[$scopeKey] = $selectedId;
+
+        // Re-read every scope: a parent change may have released a child's selection.
+        foreach ($manager->getScopes() as $scope) {
+            $this->selectedValues[$scope->key] = $manager->getSelectedId($scope->key);
+        }
 
         $this->dispatch('sub-scope-changed', scopeKey: $scopeKey, value: $selectedId);
         $this->js($this->reloadWithoutScopeQueryParametersScript());
@@ -61,6 +65,27 @@ class SubtenantScopeSelector extends Component
         }
 
         return resolve(SubtenantScopeManager::class)->getOptionsForScope($scope, $user);
+    }
+
+    /**
+     * "All Locations", or "All Locations in North" while a parent scope narrows
+     * the list, so the user can tell the options were cut down.
+     */
+    public function getAllOptionLabel(SubtenantScope $scope): string
+    {
+        $label = 'All '.str($scope->label)->plural();
+        $parentKey = $scope->getParentKey();
+        $parent = $parentKey ? resolve(SubtenantScopeManager::class)->getScope($parentKey) : null;
+        $parentId = $parent ? ($this->selectedValues[$parent->key] ?? null) : null;
+
+        if ($parent === null || $parentId === null) {
+            return $label;
+        }
+
+        $parentOption = $this->getOptionsForScope($parent)
+            ->first(fn (Model $option): bool => (int) $option->getKey() === $parentId);
+
+        return $parentOption ? "{$label} in {$parentOption->{$parent->getLabelAttribute()}}" : $label;
     }
 
     public function render(): View
