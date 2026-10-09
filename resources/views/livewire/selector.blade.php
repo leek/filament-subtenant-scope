@@ -4,7 +4,7 @@
     the panel opens but is clipped to the topbar height and appears "stuck".
     Same pattern as topbar nav groups + user menu.
 --}}
-<div class="fi-subtenant-scope-selector flex items-center gap-2">
+<div class="fi-subtenant-scope-selector flex items-center gap-1">
     @foreach ($this->scopes as $scope)
         @php
             $options = $this->getOptionsForScope($scope);
@@ -31,7 +31,7 @@
                 <x-slot name="trigger">
                     <button
                         type="button"
-                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-white/90 dark:hover:bg-white/10"
+                        class="flex items-center gap-1.5 rounded-lg py-1.5 ps-2.5 pe-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-white/90 dark:hover:bg-white/10"
                     >
                         @if ($scope->getIcon())
                             <x-filament::icon :icon="$scope->getIcon()" class="h-4 w-4 text-gray-500 dark:text-white/70" />
